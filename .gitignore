@@ -1,3 +1,21 @@
+# Исключить виртуальное окружение
+venv/
+.env/
+.env
+
+*.pyc
+__pycache__/
+
+.DS_Store
+.idea/
+.vscode/
+
+*.iml
+*.suo
+*.log
+*.sln
+*.swp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
