@@ -1,9 +1,12 @@
 import os
-from fastapi import Depends
+import select
+import uuid
+from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from models import Book, BookCondition
 from database import get_session
 from schemas import BookCreate
+from fastapi import UploadFile
 
 # Methods for Books
 async def add_book(book_data: BookCreate, session: AsyncSession = Depends(get_session)):
@@ -59,20 +62,17 @@ async def mark_book_as_favorite(book_id: int, session: AsyncSession = Depends(ge
         return book
     return None
 
-from fastapi import UploadFile, File
-
-async def upload_photo(file: UploadFile = File(...)):
-    upload_folder = "img/books"
-    os.makedirs(upload_folder, exist_ok=True)
-    file_location = os.path.join(upload_folder, file.filename)
-
+async def upload_photo(book_id: int, file: UploadFile):
+    book_folder = os.path.join("img", "books", str(book_id))
+    os.makedirs(book_folder, exist_ok=True)
+    unique_filename = f"{uuid.uuid4()}-{file.filename}"
+    file_location = os.path.join(book_folder, unique_filename)   
     try:
         with open(file_location, "wb") as f:
             f.write(file.file.read())
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error saving file: {e}")
-
-    return {"photo_url": f"/img/books/{file.filename}"}
+    return {"photo_url": f"/img/books/{book_id}/{unique_filename}"}
 
 async def get_all_book_conditions(session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(BookCondition))
