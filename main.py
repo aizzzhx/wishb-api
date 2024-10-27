@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from database import engine
 from models import Base
-from routers import auth_routes, book_routes, user_routes  
+from routers import auth_routes, book_routes, user_routes, exchange_book_routes  
 from fastapi.staticfiles import StaticFiles
 
 @asynccontextmanager
@@ -21,6 +21,7 @@ app.include_router(auth_routes.router)
 # Подключаем другие маршруты
 app.include_router(book_routes.router, prefix="/api", tags=["Books"])
 app.include_router(user_routes.router, prefix="/api", tags=["Users"])
+app.include_router(exchange_book_routes.router, prefix="/api", tags=["Exchange"])
 
 @app.get("/")
 async def read_root():
