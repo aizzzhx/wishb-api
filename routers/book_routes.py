@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import Book, BookCondition
 from schemas import BookCreate, BookConditionResponse, BookResponse
 from database import get_session, get_async_session
 from typing import List
@@ -15,7 +14,6 @@ from services.books import (
 )
 
 router = APIRouter()
-
 @router.post("/books/", response_model=BookResponse)
 async def add_book(book: BookCreate, session: AsyncSession = Depends(get_session)):
     return await add_book(session, book)
@@ -39,9 +37,9 @@ async def remove_book(book_id: int, session: AsyncSession = Depends(get_session)
 async def favorite_book(book_id: int, session: AsyncSession = Depends(get_session)):
     return await mark_book_as_favorite(session, book_id)
 
-@router.post("/upload-photo/")
-async def upload_photo_route(file: UploadFile = File(...)):
-    return await upload_photo(file)
+@router.post("/upload-photo/{book_id}")
+async def upload_photo_route(book_id: int, file: UploadFile = File(...)):
+    return await upload_photo(book_id, file)
 
 @router.get("/book-conditions/", response_model=List[BookConditionResponse])
 async def get_book_conditions(session: AsyncSession = Depends(get_async_session)):
